@@ -2,14 +2,13 @@ package types
 
 import (
 	"fmt"
-	raml_parser "github.com/michaelcmelton/raml-parser"
 	"regexp"
 
 	"gopkg.in/yaml.v3"
 )
 
 type StringScalar struct {
-	BaseScalar
+	BaseType
 	Pattern   *regexp.Regexp
 	MinLength int
 	MaxLength int
@@ -22,7 +21,6 @@ type stringScalarFacets struct {
 }
 
 func (s *StringScalar) UnmarshalYAML(node *yaml.Node) error {
-	var facets *stringScalarFacets
 
 	// Set Defaults according to string scalar spec
 	s.MinLength = 0
@@ -36,6 +34,8 @@ func (s *StringScalar) UnmarshalYAML(node *yaml.Node) error {
 		return nil
 	}
 
+	var facets *stringScalarFacets
+
 	err := properties.Decode(&facets)
 
 	if err != nil {
@@ -43,11 +43,11 @@ func (s *StringScalar) UnmarshalYAML(node *yaml.Node) error {
 	}
 
 	if facets.MinLength < 0 {
-		return fmt.Errorf(raml_parser.ErrValidation, s.Name, "minimum length, if provided, must be equal to or greater than zero")
+		return fmt.Errorf(ErrValidation, s.Name, "minimum length, if provided, must be equal to or greater than zero")
 	}
 
 	if facets.MaxLength < 0 {
-		return fmt.Errorf(raml_parser.ErrValidation, s.Name, "maximum length, if provided, must be equal to or greater than zero")
+		return fmt.Errorf(ErrValidation, s.Name, "maximum length, if provided, must be equal to or greater than zero")
 	}
 
 	if facets.MinLength != 0 {
